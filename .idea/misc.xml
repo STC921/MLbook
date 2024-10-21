@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="MLbook" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="MLbook" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="py230" project-jdk-type="Python SDK" />
 </project>
