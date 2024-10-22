@@ -59,12 +59,17 @@ h = 8
 multihead_U_query = torch.rand(h, d, d)
 multihead_U_key = torch.rand(h, d, d)
 multihead_U_value = torch.rand(h, d, d)
-multihead_query_2 = multihead_U_query.matmul(x_2)
+multihead_query_2 = multihead_U_query.matmul(x_2) #qj = uqj * x
 print(multihead_U_query.shape)
-multihead_key_2 = multihead_U_key.matmul(x_2)
-multihead_value_2 = multihead_U_value.matmul(x_2)
+multihead_key_2 = multihead_U_key.matmul(x_2) #kj = ukj * x
+multihead_value_2 = multihead_U_value.matmul(x_2) #vk = uvj * x
 print(multihead_key_2[2])
 stacked_inputs = embedded_sentence.T.repeat(8, 1, 1)
 print(stacked_inputs.shape)
-multihead_keys = torch.bmm(multihead_U_key, stacked_inputs)
+multihead_keys = torch.bmm(multihead_U_key, stacked_inputs) #k ==> h=8
 print(multihead_keys.shape)
+multihead_keys = multihead_keys.permute(0, 2, 1)
+print(multihead_keys.shape)
+print(multihead_keys[2, 1])
+multihead_values = torch.matmul(multihead_U_value, stacked_inputs)
+multihead_values = multihead_values.permute(0, 2, 1)
