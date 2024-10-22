@@ -60,7 +60,7 @@ multihead_U_query = torch.rand(h, d, d)
 multihead_U_key = torch.rand(h, d, d)
 multihead_U_value = torch.rand(h, d, d)
 multihead_query_2 = multihead_U_query.matmul(x_2) #qj = uqj * x
-print(multihead_U_query.shape)
+print(multihead_query_2.shape)
 multihead_key_2 = multihead_U_key.matmul(x_2) #kj = ukj * x
 multihead_value_2 = multihead_U_value.matmul(x_2) #vk = uvj * x
 print(multihead_key_2[2])
