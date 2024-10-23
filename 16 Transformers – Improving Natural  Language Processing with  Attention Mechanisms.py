@@ -77,3 +77,18 @@ multihead_z_2 = torch.rand(8, 16)
 linear = torch.nn.Linear(8*16, 16)
 context_vector_2 = linear(multihead_z_2.flatten())
 print(context_vector_2.shape)
+
+from transformers import pipeline, set_seed
+generator = pipeline('text-generation', model='gpt2', device=0)
+set_seed(123)
+print(generator("Hey readers, today is", max_length=20, num_return_sequences=3))
+from transformers import GPT2Tokenizer
+tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+text = "Let us encode this sentence"
+encoded_input = tokenizer(text, return_tensors='pt')
+print(encoded_input)
+from transformers import GPT2Model
+model = GPT2Model.from_pretrained('gpt2')
+output = model(**encoded_input)
+print(output['last_hidden_state'].shape)
+
