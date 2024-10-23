@@ -72,112 +72,112 @@ test_loader = torch.utils.data.DataLoader(
     test_dataset, batch_size=16, shuffle=False
 )
 
-# model = DistilBertForSequenceClassification.from_pretrained(
-#     'distilbert-base-uncased',
-# )
-# model.to(DEVICE)
-# model.train()
-#
-# optim = torch.optim.Adam(model.parameters(), lr=5e-5)
-#
-# def compute_accuracy(model, data_loader, device):
-#     with torch.no_grad():
-#         correct_pred, num_examples = 0, 0
-#         for batch_idx, batch in enumerate(data_loader):
-#             #prepare the data
-#             input_ids = batch['input_ids'].to(device)
-#             attention_mask = batch['attention_mask'].to(device)
-#             labels = batch['labels'].to(device)
-#
-#             outputs = model(input_ids, attention_mask=attention_mask)
-#             logits = outputs['logits']
-#             predicted_labels = torch.argmax(logits, 1)
-#             num_examples += labels.size(0)
-#             correct_pred += (predicted_labels == labels).sum()
-#     return correct_pred.float()/num_examples * 100
-#
-# start_time = time.time()
-#
-# for epoch in range(NUM_EPOCHS):
-#
-#     model.train()
-#
-#     for batch_idx, batch in enumerate(train_loader):
-#
-#         #prepare the data
-#         input_ids = batch['input_ids'].to(DEVICE)
-#         attention_mask = batch['attention_mask'].to(DEVICE)
-#         labels = batch['labels'].to(DEVICE)
-#
-#         #forward pass
-#         outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-#         loss, logits = outputs['loss'], outputs['logits']
-#
-#         #backward pass
-#         optim.zero_grad()
-#         loss.backward()
-#         optim.step()
-#
-#         #logging
-#         if not batch_idx % 250:
-#             print(f'Epoch: {epoch+1:04d}/{NUM_EPOCHS:04d}  |  Batch {batch_idx:04d}/{len(train_loader):04d}  |  Loss: {loss:.4f}')
-#
-#     model.eval()
-#
-#     with torch.set_grad_enabled(False):
-#         print(f'Training accuracy: {compute_accuracy(model, train_loader, DEVICE):.2f}%'
-#               f'\nValid accuracy: {compute_accuracy(model, valid_loader, DEVICE):.2f}%')
-#
-#     print(f'Time elapsed: {(time.time() - start_time)/60:.2f} min')
-#
-# print(f'Total Training Time: {(time.time() - start_time)/60:.2f} min')
-# print(f'Test accuracy: {compute_accuracy(model, test_loader, DEVICE):.2f}%')
-
-model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased')
+model = DistilBertForSequenceClassification.from_pretrained(
+    'distilbert-base-uncased',
+)
 model.to(DEVICE)
 model.train()
+
 optim = torch.optim.Adam(model.parameters(), lr=5e-5)
 
-from transformers import Trainer, TrainingArguments
-training_args = TrainingArguments(
-    output_dir='./results',
-    num_train_epochs=NUM_EPOCHS,
-    per_device_train_batch_size=16,
-    per_device_eval_batch_size=16,
-    logging_dir='./logs',
-    logging_steps=10,
-)
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset,
-    optimizers=(optim, None)
-)
-from datasets import load_metric
-import numpy as np
+def compute_accuracy(model, data_loader, device):
+    with torch.no_grad():
+        correct_pred, num_examples = 0, 0
+        for batch_idx, batch in enumerate(data_loader):
+            #prepare the data
+            input_ids = batch['input_ids'].to(device)
+            attention_mask = batch['attention_mask'].to(device)
+            labels = batch['labels'].to(device)
 
-metric = load_metric("accuracy")
-
-def compute_metrics(eval_pred):
-    logits, labels = eval_pred
-    predictions = np.argmax(logits, axis=-1)
-    return metric.compute(predictions=predictions, references=labels)
-
-trainer=Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset,
-    eval_dataset=test_dataset,
-    compute_metrics=compute_metrics,
-    optimizers=(optim, None)
-)
+            outputs = model(input_ids, attention_mask=attention_mask)
+            logits = outputs['logits']
+            predicted_labels = torch.argmax(logits, 1)
+            num_examples += labels.size(0)
+            correct_pred += (predicted_labels == labels).sum()
+    return correct_pred.float()/num_examples * 100
 
 start_time = time.time()
-trainer.train()
-print(f'Total training time: {(time.time() - start_time)/60:.2f} min')
-print(trainer.evaluate())
 
-model.eval()
-model.to(DEVICE)
+for epoch in range(NUM_EPOCHS):
 
-print(f'Test accuracy: {compute_accuracy()}')
+    model.train()
+
+    for batch_idx, batch in enumerate(train_loader):
+
+        #prepare the data
+        input_ids = batch['input_ids'].to(DEVICE)
+        attention_mask = batch['attention_mask'].to(DEVICE)
+        labels = batch['labels'].to(DEVICE)
+
+        #forward pass
+        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+        loss, logits = outputs['loss'], outputs['logits']
+
+        #backward pass
+        optim.zero_grad()
+        loss.backward()
+        optim.step()
+
+        #logging
+        if not batch_idx % 250:
+            print(f'Epoch: {epoch+1:04d}/{NUM_EPOCHS:04d}  |  Batch {batch_idx:04d}/{len(train_loader):04d}  |  Loss: {loss:.4f}')
+
+    model.eval()
+
+    with torch.set_grad_enabled(False):
+        print(f'Training accuracy: {compute_accuracy(model, train_loader, DEVICE):.2f}%'
+              f'\nValid accuracy: {compute_accuracy(model, valid_loader, DEVICE):.2f}%')
+
+    print(f'Time elapsed: {(time.time() - start_time)/60:.2f} min')
+
+print(f'Total Training Time: {(time.time() - start_time)/60:.2f} min')
+print(f'Test accuracy: {compute_accuracy(model, test_loader, DEVICE):.2f}%')
+
+# model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased')
+# model.to(DEVICE)
+# model.train()
+# optim = torch.optim.Adam(model.parameters(), lr=5e-5)
+#
+# from transformers import Trainer, TrainingArguments
+# training_args = TrainingArguments(
+#     output_dir='./results',
+#     num_train_epochs=NUM_EPOCHS,
+#     per_device_train_batch_size=16,
+#     per_device_eval_batch_size=16,
+#     logging_dir='./logs',
+#     logging_steps=10,
+# )
+# trainer = Trainer(
+#     model=model,
+#     args=training_args,
+#     train_dataset=train_dataset,
+#     optimizers=(optim, None)
+# )
+# from datasets import load_metric
+# import numpy as np
+#
+# metric = load_metric("accuracy")
+#
+# def compute_metrics(eval_pred):
+#     logits, labels = eval_pred
+#     predictions = np.argmax(logits, axis=-1)
+#     return metric.compute(predictions=predictions, references=labels)
+#
+# trainer=Trainer(
+#     model=model,
+#     args=training_args,
+#     train_dataset=train_dataset,
+#     eval_dataset=test_dataset,
+#     compute_metrics=compute_metrics,
+#     optimizers=(optim, None)
+# )
+#
+# start_time = time.time()
+# trainer.train()
+# print(f'Total training time: {(time.time() - start_time)/60:.2f} min')
+# print(trainer.evaluate())
+#
+# model.eval()
+# model.to(DEVICE)
+#
+# print(f'Test accuracy: {compute_accuracy()}')
