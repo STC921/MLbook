@@ -189,3 +189,12 @@ for epoch in range(1, num_epochs+1):
     all_d_fake.append(torch.tensor(d_vals_fake).mean())
     print(f'Epoch {epoch:03d} | Avg Losses >> G/D {all_g_losses[-1]:.4f}/{all_d_losses[-1]:.4f} [D_Real:{all_d_real[-1]:.4f} D-Fake:{all_d_fake[-1]:.4f}]')
     epoch_samples.append(create_samples(gen_model, fixed_z).detach().cpu().numpy())
+
+import itertools
+fig = plt.figure(figsize=(16, 6))
+
+ax = fig.add_subplot(1, 2, 1)
+plt.plot(all_g_losses, label='Generator Loss')
+half_d_losses = [all_d_loss/2 for all_d_loss in all_d_losses]
+plt.plot(half_d_losses, label='Discriminator Loss')
+plt.legend(fontsize)
